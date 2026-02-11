@@ -1,0 +1,182 @@
+// Cuantificadores y Verificación de Propiedades Matemáticas
+// Usa forall y exists para validar propiedades sobre conjuntos
+
+print("=== Cuantificadores Lógicos ===");
+print("");
+
+// ==========================================
+// PARTE 1: Cuantificador Universal (FORALL)
+// ==========================================
+
+print("--- Cuantificador Universal (∀) ---");
+print("");
+
+// Conjunto de números
+numeros := {1, 2, 3, 4, 5};
+print("Conjunto de números:", numeros);
+print("");
+
+// Verificar: "Todos los números son positivos"
+todos_positivos := forall x in numeros, x > 0;
+print("¿Todos los números son positivos?");
+if todos_positivos then
+    print("SÍ: ∀x ∈ numeros, x > 0");
+else
+    print("NO");
+end;
+print("");
+
+// Verificar: "Todos los números son menores que 10"
+todos_menores_10 := forall x in numeros, x < 10;
+print("¿Todos los números son menores que 10?");
+if todos_menores_10 then
+    print("SÍ: ∀x ∈ numeros, x < 10");
+else
+    print("NO");
+end;
+print("");
+
+// Verificar: "Todos los números son pares"
+todos_pares := forall x in numeros, x mod 2 = 0;
+print("¿Todos los números son pares?");
+if todos_pares then
+    print("SÍ");
+else
+    print("NO: ∃x tal que x es impar");
+end;
+print("");
+
+// ==========================================
+// PARTE 2: Cuantificador Existencial (EXISTS)
+// ==========================================
+
+print("--- Cuantificador Existencial (∃) ---");
+print("");
+
+// Verificar: "Existe algún número par"
+existe_par := exists x in numeros, x mod 2 = 0;
+print("¿Existe algún número par?");
+if existe_par then
+    print("SÍ: ∃x ∈ numeros tal que x mod 2 = 0");
+else
+    print("NO");
+end;
+print("");
+
+// Verificar: "Existe algún número mayor que 3"
+existe_mayor_3 := exists x in numeros, x > 3;
+print("¿Existe algún número mayor que 3?");
+if existe_mayor_3 then
+    print("SÍ: ∃x ∈ numeros, x > 3");
+else
+    print("NO");
+end;
+print("");
+
+// Verificar: "Existe algún número negativo"
+existe_negativo := exists x in numeros, x < 0;
+print("¿Existe algún número negativo?");
+if existe_negativo then
+    print("SÍ");
+else
+    print("NO: ∀x ∈ numeros, x ≥ 0");
+end;
+print("");
+
+// ==========================================
+// PARTE 3: Propiedades Matemáticas
+// ==========================================
+
+print("--- Verificación de Propiedades Matemáticas ---");
+print("");
+
+// Conjunto de cuadrados perfectos
+cuadrados := {1, 4, 9, 16, 25};
+print("Conjunto de cuadrados perfectos:", cuadrados);
+print("");
+
+// Verificar: "Todos son cuadrados de números naturales"
+// Para cada x en cuadrados, existe n en {1..5} tal que n² = x
+naturales := {1, 2, 3, 4, 5};
+
+print("¿Todos son cuadrados perfectos de {1..5}?");
+// Verificar cada elemento individualmente
+es_cuadrado_1 := exists n in naturales, n^2 = 1;
+es_cuadrado_4 := exists n in naturales, n^2 = 4;
+es_cuadrado_9 := exists n in naturales, n^2 = 9;
+es_cuadrado_16 := exists n in naturales, n^2 = 16;
+es_cuadrado_25 := exists n in naturales, n^2 = 25;
+
+todos_cuadrados := es_cuadrado_1 && es_cuadrado_4 && es_cuadrado_9 && 
+                   es_cuadrado_16 && es_cuadrado_25;
+
+if todos_cuadrados then
+    print("SÍ: Cada elemento es cuadrado de algún natural");
+else
+    print("NO");
+end;
+print("");
+
+// ==========================================
+// PARTE 4: Números Primos
+// ==========================================
+
+print("--- Verificación de Propiedades de Primos ---");
+print("");
+
+primos := {2, 3, 5, 7, 11};
+print("Conjunto de primos:", primos);
+print("");
+
+// Verificar: "Todos los primos (excepto 2) son impares"
+primos_sin_2 := {3, 5, 7, 11};
+todos_impares := forall p in primos_sin_2, p mod 2 = 1;
+print("¿Todos los primos (excepto 2) son impares?");
+if todos_impares then
+    print("SÍ: ∀p ∈ {3,5,7,11}, p mod 2 = 1");
+else
+    print("NO");
+end;
+print("");
+
+// Verificar: "Existe algún primo mayor que 10"
+existe_primo_grande := exists p in primos, p > 10;
+print("¿Existe algún primo mayor que 10?");
+if existe_primo_grande then
+    print("SÍ: ∃p ∈ primos, p > 10");
+else
+    print("NO");
+end;
+print("");
+
+// ==========================================
+// PARTE 5: Relaciones entre Conjuntos
+// ==========================================
+
+print("--- Relaciones entre Conjuntos ---");
+print("");
+
+pares := {2, 4, 6, 8, 10};
+print("Conjunto de pares:", pares);
+print("");
+
+// Verificar: "Ningún primo (excepto 2) es par"
+ningun_primo_impar_es_par := forall p in primos_sin_2, !(p in pares);
+print("¿Ningún primo impar es par?");
+if ningun_primo_impar_es_par then
+    print("SÍ: ∀p ∈ primos_impares, p ∉ pares");
+else
+    print("NO: Existe contradicción");
+end;
+print("");
+
+// Verificar: "Todos los elementos de un conjunto son distintos de cero"
+no_ceros := {1, 2, 3, -1, -2};
+todos_no_cero := forall x in no_ceros, x != 0;
+print("Conjunto:", no_ceros);
+print("¿Todos los elementos son distintos de cero?");
+if todos_no_cero then
+    print("SÍ: ∀x ∈ conjunto, x ≠ 0");
+else
+    print("NO: ∃x = 0");
+end;

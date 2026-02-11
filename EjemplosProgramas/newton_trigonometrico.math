@@ -1,0 +1,99 @@
+// Método de Newton-Raphson para Ecuaciones Trigonométricas
+// Encuentra raíces de ecuaciones que involucran sin, cos
+// Ejemplo: f(x) = cos(x) - x (tiene raíz en x ≈ 0.739)
+
+print("=== Newton-Raphson para Ecuaciones Trigonométricas ===");
+print("");
+
+// Definir función: f(x) = cos(x) - x
+def f(x) do
+    return cos(x) - x
+end;
+
+// Derivada: f'(x) = -sin(x) - 1
+def df(x) do
+    return -sin(x) - 1
+end;
+
+// Parámetros
+x0 := 1;         // Punto inicial
+tol := 0.00001;  // Tolerancia
+max_iter := 50;  // Máximo de iteraciones
+
+print("Función: f(x) = cos(x) - x");
+print("Punto inicial x0 =", x0);
+print("");
+
+// Constantes matemáticas disponibles
+print("Usando constantes matemáticas:");
+print("π (pi) =", pi);
+print("e =", e);
+print("");
+
+// Iteraciones del método
+x := x0;
+i := 0;
+convergio := false;
+
+print("--- Iteraciones ---");
+while i < max_iter do
+    fx := f(x);
+    dfx := df(x);
+    
+    print("Iteración", i);
+    print("x =", x);
+    print("f(x) =", fx);
+    
+    if abs(fx) < tol then
+        convergio := true;
+        i := max_iter;  // Salir del bucle
+    else
+        if abs(dfx) > 0.00001 then
+            x := x - fx / dfx;
+        else
+            print("Derivada muy pequeña, no converge");
+            i := max_iter;
+        end;
+    end;
+    
+    i := i + 1
+end;
+
+print("");
+if convergio then
+    print("✓ Convergencia exitosa");
+    print("");
+    print("Raíz encontrada: x =", x);
+    print("");
+    
+    // Verificación con funciones trigonométricas
+    print("=== Verificación ===");
+    print("cos(x) =", cos(x));
+    print("x =", x);
+    print("cos(x) - x =", f(x));
+    print("");
+    
+    // Ejemplos adicionales de funciones trigonométricas
+    print("=== Evaluaciones Trigonométricas ===");
+    
+    test1 := pi / 2;
+    print("sin(π/2) =", sin(test1));
+    
+    test2 := pi;
+    print("cos(π) =", cos(test2));
+    
+    test3 := pi / 4;
+    print("sin(π/4) =", sin(test3));
+    print("cos(π/4) =", cos(test3));
+    
+    // sin²(x) + cos²(x) = 1
+    sin_val := sin(x);
+    cos_val := cos(x);
+    identidad := sin_val^2 + cos_val^2;
+    print("");
+    print("Identidad trigonométrica:");
+    print("sin²(x) + cos²(x) =", identidad);
+    print("(debería ser ≈ 1)");
+else
+    print("✗ No convergió");
+end;

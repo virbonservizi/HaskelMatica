@@ -1,0 +1,189 @@
+// Método de Eliminación Gaussiana con Pivoteo Parcial
+// Resuelve sistemas de ecuaciones lineales Ax = b
+// Basado en el código de Scilab - Práctica 4
+
+// Sistema de ejemplo (del ejercicio de Scilab):
+//  0x + 2y + 3z = 7
+//  2x + 0y + 3z = 13
+//  8x + 16y - z = -3
+// Solución esperada: x=4, y=-1, z=1
+
+print("=== Método de Eliminación Gaussiana con Pivoteo Parcial ===");
+
+// Matriz de coeficientes A (3x3)
+A := [0, 2, 3; 2, 0, 3; 8, 16, -1];
+
+// Vector de términos independientes b
+b1 := 7;
+b2 := 13;
+b3 := -3;
+
+print("Matriz A original:", A);
+print("Vector b:");
+print("(", b1, b2, b3, ")");
+
+// Construir matriz aumentada [A|b]
+// Para un sistema 3x3, la matriz aumentada es 3x4
+A := [0, 2, 3, 7; 
+        2, 0, 3, 13; 
+        8, 16, -1, -3];
+
+print("Matriz aumentada [A|b]:", A);
+
+n := 3;  // Dimensión del sistema
+
+// =============================================
+// FASE 1: Eliminación progresiva con pivoteo parcial
+// =============================================
+
+print("--- Eliminación progresiva ---");
+
+// Para k = 1 (primera columna)
+k := 1;
+print("Paso k=1:");
+
+// Buscar el pivote (elemento con mayor valor absoluto en la columna k)
+kpivot := k;
+amax := abs(A[k,k]);
+
+// Buscar en las filas k+1, k+2, ..., n
+i := k + 1;
+while i <= n do
+    if abs(A[i,k]) > amax then
+        kpivot := i;
+        amax := abs(A[i,k]);
+    end;
+    i := i + 1;
+end;
+
+print("Pivote en fila:", kpivot);
+
+// Intercambiar filas k y kpivot
+if kpivot != k then
+    A := swaprows(A, k, kpivot);
+    print("Después del intercambio:", A)
+end;
+
+// Eliminación: hacer ceros debajo del pivote
+i := k + 1;
+while i <= n do
+    mik := A[i,k] / A[k,k];
+    print("Multiplicador m", i, k, "=", mik);
+    
+    // Actualizar fila i: fila_i = fila_i - mik * fila_k
+    j := k + 1;
+    while j <= n + 1 do
+        nuevo_val := A[i,j] - mik * A[k,j];
+        
+        if i = 2 then
+            if j = 2 then A := [A[1,1], A[1,2], A[1,3], A[1,4];
+                                   A[2,1], nuevo_val, A[2,3], A[2,4];
+                                   A[3,1], A[3,2], A[3,3], A[3,4]];
+            else 
+                if j = 3 then A := [A[1,1], A[1,2], A[1,3], A[1,4];
+                                       A[2,1], A[2,2], nuevo_val, A[2,4];
+                                       A[3,1], A[3,2], A[3,3], A[3,4]];
+                else A := [A[1,1], A[1,2], A[1,3], A[1,4];
+                              A[2,1], A[2,2], A[2,3], nuevo_val;
+                              A[3,1], A[3,2], A[3,3], A[3,4]];
+                end
+            end
+        else
+            if j = 2 then A := [A[1,1], A[1,2], A[1,3], A[1,4];
+                                   A[2,1], A[2,2], A[2,3], A[2,4];
+                                   A[3,1], nuevo_val, A[3,3], A[3,4]];
+            else 
+                if j = 3 then A := [A[1,1], A[1,2], A[1,3], A[1,4];
+                                       A[2,1], A[2,2], A[2,3], A[2,4];
+                                       A[3,1], A[3,2], nuevo_val, A[3,4]];
+                else A := [A[1,1], A[1,2], A[1,3], A[1,4];
+                              A[2,1], A[2,2], A[2,3], A[2,4];
+                              A[3,1], A[3,2], A[3,3], nuevo_val];
+                end
+            end
+        end;
+        
+        j := j + 1
+    end;
+    
+    // Hacer cero en la posición [i,k]
+    if i = 2 then
+        A := [A[1,1], A[1,2], A[1,3], A[1,4];
+                0, A[2,2], A[2,3], A[2,4];
+                A[3,1], A[3,2], A[3,3], A[3,4]];
+    else
+        A := [A[1,1], A[1,2], A[1,3], A[1,4];
+                A[2,1], A[2,2], A[2,3], A[2,4];
+                0, A[3,2], A[3,3], A[3,4]];
+    end;
+    
+    i := i + 1
+end;
+
+print("Después de eliminar columna 1:", A);
+
+// Para k = 2 (segunda columna)
+k := 2;
+print("Paso k=2:");
+
+// Buscar pivote en columna 2, filas 2 y 3
+kpivot := k;
+amax := abs(A[k,k]);
+
+if abs(A[3,2]) > amax then
+    kpivot := 3;
+    amax := abs(A[3,2])
+end;
+
+print("Pivote en fila:", kpivot);
+
+// Intercambiar filas si es necesario
+if kpivot != k then
+    A := swaprows(A, k, kpivot);
+    print("Después del intercambio:", A)
+end;
+
+// Eliminación: hacer cero debajo del pivote en fila 3
+mik := A[3,k] / A[k,k];
+print("Multiplicador m32=", mik);
+
+// Actualizar fila 3
+A := [A[1,1], A[1,2], A[1,3], A[1,4];
+        A[2,1], A[2,2], A[2,3], A[2,4];
+        0, 0, A[3,3] - mik * A[k,3], A[3,4] - mik * A[k,4]];
+
+print("Matriz triangular superior:", A);
+
+// =============================================
+// FASE 2: Sustitución regresiva
+// =============================================
+
+print("--- Sustitución regresiva ---");
+
+// x3 = A[3,4] / A[3,3]
+x3 := A[3,4] / A[3,3];
+print("x3 =", x3);
+
+// x2 = (A[2,4] - A[2,3]*x3) / A[2,2]
+x2 := (A[2,4] - A[2,3]*x3) / A[2,2];
+print("x2 =", x2);
+
+// x1 = (A[1,4] - A[1,2]*x2 - A[1,3]*x3) / A[1,1]
+x1 := (A[1,4] - A[1,2]*x2 - A[1,3]*x3) / A[1,1];
+print("x1 =", x1);
+
+print("=== Solución del sistema ===");
+print("x =", x1);
+print("y =", x2);
+print("z =", x3);
+
+// Verificación: Ax = b
+print("--- Verificación Ax = b ---");
+// Extraer matriz de coeficientes (primeras 3 columnas de A)
+A_coef := [A[1,1], A[1,2], A[1,3];
+           A[2,1], A[2,2], A[2,3];
+           A[3,1], A[3,2], A[3,3]];
+x_vec := (x1, x2, x3);
+resultado := A_coef #.* x_vec;
+print("Ax =", resultado);
+print("b = (", b1, b2, b3, ")");

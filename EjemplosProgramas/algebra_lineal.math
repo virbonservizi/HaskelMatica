@@ -1,0 +1,179 @@
+// Álgebra Lineal - Operaciones con Vectores y Matrices
+// Demuestra producto matriz-vector, transpuesta, normas, etc.
+
+print("=== Operaciones de Álgebra Lineal ===");
+print("");
+
+// ==========================================
+// PARTE 1: Operaciones con Vectores
+// ==========================================
+
+print("--- Vectores ---");
+print("");
+
+// Definir vectores
+v1 := (1, 2, 3);
+v2 := (4, 5, 6);
+
+print("Vector v1 =", v1);
+print("Vector v2 =", v2);
+print("");
+
+// Suma de vectores
+v_suma := v1 .+ v2;
+print("v1 + v2 =", v_suma);
+
+// Resta de vectores
+v_resta := v1 .- v2;
+print("v1 - v2 =", v_resta);
+
+// Producto punto (dot product)
+dot_product := (1, 2, 3) .* (4, 5, 6);
+print("v1 · v2 (producto punto) =", dot_product);
+print("");
+
+// Multiplicación por escalar
+escalar := 3;
+v_escala := scal(escalar, v1);
+print("3 * v1 =", v_escala);
+print("");
+
+// Normas de vectores
+print("--- Normas del vector v1 ---");
+
+norma_1 := norm(v1, "1");
+print("Norma L1 (suma de valores absolutos) =", norma_1);
+
+norma_2 := norm(v1, "2");
+print("Norma L2 (euclidiana) =", norma_2);
+
+norma_inf := norm(v1, "inf");
+print("Norma infinito (máximo valor absoluto) =", norma_inf);
+print("");
+
+// Máximo y mínimo
+print("Máximo de v1 =", max(v1));
+print("Mínimo de v1 =", min(v1));
+print("");
+
+// ==========================================
+// PARTE 2: Operaciones con Matrices
+// ==========================================
+
+print("--- Matrices ---");
+print("");
+
+// Definir matrices
+A := [1, 2, 3;
+      4, 5, 6;
+      7, 8, 9];
+
+B := [9, 8, 7;
+      6, 5, 4;
+      3, 2, 1];
+
+print("Matriz A =", A);
+print("Matriz B =", B);
+print("");
+
+// Transpuesta
+A_t := trans(A);
+print("Transpuesta de A:", A_t);
+print("");
+
+// Suma de matrices
+suma_mat := A #+ B;
+print("A + B =", suma_mat);
+
+// Resta de matrices
+resta_mat := A #- B;
+print("A - B =", resta_mat);
+print("");
+
+// Multiplicación de matrices
+producto_mat := A #* B;
+print("A * B =", producto_mat);
+print("");
+
+// Matriz identidad
+I := eye(3);
+print("Matriz Identidad (3x3) =", I);
+print("");
+
+// Diagonal de una matriz
+diag_A := diag(A);
+print("Diagonal de A =", diag_A);
+print("");
+
+// Triangular superior
+triu_A := triu(A);
+print("Triangular superior de A =", triu_A);
+
+// Triangular inferior
+tril_A := tril(A);
+print("Triangular inferior de A =", tril_A);
+print("");
+
+// ==========================================
+// PARTE 3: Producto Matriz-Vector
+// ==========================================
+
+print("--- Producto Matriz-Vector ---");
+print("");
+
+x := (1, 2, 3);
+print("Vector x =", x);
+
+// A * x
+Ax := A #.* x;
+print("A * x =", Ax);
+
+// x * A (vector fila por matriz)
+xA := x .#* A;
+print("x * A =", xA);
+print("");
+
+// ==========================================
+// PARTE 4: Extracción de Filas y Columnas
+// ==========================================
+
+print("--- Extracción de Filas y Columnas ---");
+print("");
+
+// Extraer fila 2
+fila_2 := A[2,:];
+print("Fila 2 de A:", fila_2);
+
+// Extraer columna 1
+col_1 := A[:,1];
+print("Columna 1 de A:", col_1);
+print("");
+
+// ==========================================
+// PARTE 5: Verificación de Propiedades
+// ==========================================
+
+print("--- Verificaciones ---");
+print("");
+
+// Verificar: (A^T)^T = A
+A_t_t := trans(trans(A));
+print("Verificando (A^T)^T = A:");
+print("(A^T)^T =", A_t_t);
+
+// Dimensiones
+filas := rows(A);
+columnas := cols(A);
+print("");
+print("Dimensiones de A:");
+print("Filas =", filas);
+print("Columnas =", columnas);
+print("");
+
+// Vector de ceros
+v_ceros := zeros(5);
+print("Vector de ceros (tamaño 5):", v_ceros);
+
+// Matriz de unos
+M_unos := ones(2, 3);
+print("Matriz de unos (2x3):", M_unos);

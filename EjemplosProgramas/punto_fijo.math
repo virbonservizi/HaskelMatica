@@ -1,0 +1,39 @@
+// Método de Punto Fijo
+// Para resolver x = g(x)
+
+// Definir la función de iteración g(x)
+// Ejemplo: Para resolver x^2 - 4 = 0
+//          Reescribimos como x = sqrt(4) = 2
+//          Entonces g(x) = sqrt(x + 4)
+def g(x) do
+    return (sqrt(x + 4));
+end;
+
+// Parámetros del método
+x0 := 1;         // Valor inicial
+tol := 0.0001;   // Tolerancia
+max_iter := 100; // Máximo de iteraciones
+
+print("=== Método de Punto Fijo ===");
+print("Valor inicial:", x0);
+
+i := 0;
+x1 := g(x0);
+diff := abs(x1 - x0);
+
+while diff > tol && i < max_iter do
+    i := i + 1;
+    x0 := x1;
+    x1 := g(x0);
+    diff := abs(x1 - x0);
+end;
+
+if diff > tol then
+    error("Alcanzó el máximo de iteraciones");
+end;
+
+print("Convergió exitosamente");
+
+print("Iteraciones:", i);
+print("Punto fijo aproximado:", x1);
+print("Error:", diff);

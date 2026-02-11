@@ -1,0 +1,52 @@
+// Método de Bisección
+// Encuentra raíces de una función en un intervalo [a, b]
+// Requiere: f(a) * f(b) < 0 y que la función sea continua en dicho intervalo. 
+
+// Definir la función como lambda
+// Ejemplo: f(x) = x^2 - 4 (tiene raíz en x=2)
+def f(x) do
+    return (x^2 - 4)
+end;
+
+// Parámetros del método
+a := 0;          // Extremo inferior
+b := 3;          // Extremo superior
+tol := 0.0001;   // Tolerancia
+max_iter := 100; // Máximo de iteraciones
+
+// Verificar condición inicial
+fa := f(a);
+fb := f(b);
+
+print("=== Método de Bisección ===");
+print("Buscando raíz en el intervalo:", a, b);
+
+if fa * fb > 0 then
+    error("f(a) y f(b) deben tener signos opuestos")
+end;
+
+i := 0;
+c := (a + b) / 2;
+fc := f(c);
+diff := abs(b - a);
+
+while diff > tol && i < max_iter do
+    i := i + 1;
+    
+    if fa * fc < 0 then
+        b := c;
+        fb := fc;
+    else
+        a := c;
+        fa := fc;
+    end;
+    
+    c := (a + b) / 2;
+    fc := f(c);
+    diff := abs(b - a)
+end;
+
+print("Iteraciones:", i);
+print("Raíz aproximada:", c);
+print("Error:", diff)
+

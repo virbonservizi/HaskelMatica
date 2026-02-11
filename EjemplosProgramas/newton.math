@@ -1,0 +1,42 @@
+// Método de Newton-Raphson
+// Encuentra raíces de una función usando derivadas
+
+// Definir la función y su derivada
+// Ejemplo: f(x) = x^2 - 4 (raíz en x=2)
+//          f'(x) = 2*x
+def f(x) do
+    return (x^2 - 4);
+end;
+
+def df(x) do
+    return (2 * x);
+end;
+
+// Parámetros del método
+x0 := 3;         // Valor inicial
+tol := 0.0001;   // Tolerancia
+max_iter := 100; // Máximo de iteraciones
+
+print("=== Método de Newton-Raphson ===");
+print("Valor inicial:", x0);
+
+i := 0;
+x1 := x0 - f(x0) / df(x0);
+diff := abs(x1 - x0);
+
+while diff > tol && i < max_iter do
+    i := i + 1;
+    x0 := x1;
+    x1 := x0 - f(x0) / df(x0);
+    diff := abs(x1 - x0);
+end;
+
+if diff > tol then
+    error("Alcanzó el máximo de iteraciones");
+end;
+
+print("Convergió exitosamente");
+
+print("Iteraciones:", i);
+print("Raíz aproximada:", x1);
+print("Error:", diff);

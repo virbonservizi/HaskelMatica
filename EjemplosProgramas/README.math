@@ -1,0 +1,38 @@
+// ============================================
+// EJEMPLOS Y DEMOSTRACIONES DEL LENGUAJE
+// ============================================
+
+// Esta carpeta contiene ejemplos variados que demuestran
+// las características del lenguaje de programación.
+
+// MÉTODOS NUMÉRICOS - Encontrar Raíces:
+// - biseccion.math: Método de Bisección (incluye Strings)
+// - newton.math: Método de Newton-Raphson
+// - secante.math: Método de la Secante
+// - punto_fijo.math: Método de Punto Fijo
+// - newton_trigonometrico.math: Newton-Raphson con funciones trigonométricas (sin, cos, pi, e)
+
+// MÉTODOS NUMÉRICOS - Sistemas Lineales:
+// - gauss_seidel.math: Método de Gauss-Seidel
+// - eliminacion_gaussiana.math: Eliminación Gaussiana con Pivoteo Parcial
+
+// MÉTODOS NUMÉRICOS - Integración:
+// - trapecio.math: Método del Trapecio Compuesto
+
+// ALGORITMOS CON CONJUNTOS:
+// - criba_eratostenes.math: Criba de Eratóstenes (números primos)
+//   Demuestra: union, diff, inter, insert, remove, cardinal, min, max, sum
+
+// ÁLGEBRA LINEAL:
+// - algebra_lineal.math: Operaciones con vectores y matrices
+//   Demuestra: .+, .-, producto punto (.*), normas (L1, L2, inf), trans, diag,
+//   triu, tril, eye, rows, cols, zeros, ones, #+, #-, #*, #.*
+
+// LÓGICA Y CUANTIFICADORES:
+// - cuantificadores.math: Uso de forall y exists
+//   Demuestra: verificación de propiedades universales y existenciales
+
+// Para ejecutar cualquier ejemplo:
+// ghci
+// :l Main.hs
+// run EjemplosProgramas/nombre_archivo.math

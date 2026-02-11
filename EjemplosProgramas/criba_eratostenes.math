@@ -1,0 +1,65 @@
+// Criba de Eratóstenes - Algoritmo para encontrar números primos
+// Usa operaciones con conjuntos para eliminar múltiplos
+// Encuentra todos los primos menores o iguales a n
+
+print("=== Criba de Eratóstenes ===");
+print("");
+
+// Límite superior
+n := 50;
+print("Buscando primos hasta:", n);
+print("");
+
+// Crear conjunto inicial de candidatos {2, 3, 4, ..., n}
+candidatos := {2..n};
+primos := {};
+
+print("Candidatos iniciales:", candidatos);
+print("");
+
+// Algoritmo de la criba
+i := 2;
+while i * i <= n do
+    // Verificar si i está en candidatos (no fue eliminado)
+    if i in candidatos then
+        // i es primo, agregarlo al conjunto de primos
+        primos := insert(primos, i);
+        
+        print("Primo encontrado:", i);
+        
+        // Eliminar todos los múltiplos de i
+        multiplos := {};
+        j := i * 2;
+        while j <= n do
+            multiplos := insert(multiplos, j);
+            j := j + i;
+        end;
+        
+        print("Eliminando múltiplos:", multiplos);
+        
+        // Usar diferencia de conjuntos para eliminar múltiplos
+        candidatos := difference(candidatos, multiplos);
+        
+        print("Candidatos restantes:", candidatos);
+        print("");
+    end;
+    
+    i := i + 1;
+end;
+
+// Los candidatos restantes también son primos
+primos := union(primos, candidatos);
+
+print("=== Resultado Final ===");
+print("Números primos hasta", n, ":");
+print(primos);
+print("");
+
+// Estadísticas usando operaciones con conjuntos
+cantidad := cardinal(primos);
+print("Cantidad de primos encontrados:", cantidad);
+
+primo_min := min(primos);
+primo_max := max(primos);
+print("Primo más pequeño:", primo_min);
+print("Primo más grande:", primo_max);

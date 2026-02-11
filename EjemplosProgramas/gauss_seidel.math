@@ -1,0 +1,60 @@
+// Método de Gauss-Seidel
+// Resuelve sistemas de ecuaciones lineales Ax = b de forma iterativa
+
+// Sistema de ejemplo: 
+// 4x + y = 5
+// x + 3y = 6
+// Solución: x=1, y=5/3
+
+// Parámetros del sistema
+a11 := 4; a12 := 1; b1 := 5;
+a21 := 1; a22 := 3; b2 := 6;
+
+// Parámetros del método
+x := 0;          // Valor inicial de x
+y := 0;          // Valor inicial de y
+tol := 0.0001;   // Tolerancia
+max_iter := 100; // Máximo de iteraciones
+
+print("=== Método de Gauss-Seidel ===");
+print("Sistema 2x2:");
+print("Valores iniciales:", x, y);
+
+i := 0;
+err := 1;
+
+while err > tol && i < max_iter do
+    i := i + 1;
+    
+    // Guardar valores previos
+    x_ant := x;
+    y_ant := y;
+    
+    // Actualizar x usando la ecuación 1
+    x := (b1 - a12 * y) / a11;
+    
+    // Actualizar y usando la ecuación 2 (con el nuevo valor de x)
+    y := (b2 - a21 * x) / a22;
+    
+    // Calcular error
+    error_x := abs(x - x_ant);
+    error_y := abs(y - y_ant);
+    
+    if error_x > error_y then
+        err := error_x;
+    else
+        err := error_y;
+    end
+end;
+
+if err > tol then
+    error("Alcanzó el máximo de iteraciones");
+end;
+
+print("Convergió exitosamente");
+
+print("Iteraciones:", i);
+print("Solución:");
+print("x =", x);
+print("y =", y);
+print("Error:", err);

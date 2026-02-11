@@ -1,0 +1,43 @@
+// Método de la Secante
+// Variante del método de Newton que no requiere derivadas
+
+// Definir la función
+// Ejemplo: f(x) = x^2 - 4 (raíz en x=2)
+def f(x) do
+    return (x^2 - 4);
+end;
+
+// Parámetros del método
+x0 := 1;         // Primer valor inicial
+x1 := 3;         // Segundo valor inicial
+tol := 0.0001;   // Tolerancia
+max_iter := 100; // Máximo de iteraciones
+
+print("=== Método de la Secante ===");
+print("Valores iniciales:", x0, x1);
+
+i := 0;
+fx0 := f(x0);
+fx1 := f(x1);
+x2 := x1 - fx1 * (x1 - x0) / (fx1 - fx0);
+diff := abs(x2 - x1);
+
+while diff > tol && i < max_iter do
+    i := i + 1;
+    x0 := x1;
+    x1 := x2;
+    fx0 := f(x0);
+    fx1 := f(x1);
+    x2 := x1 - fx1 * (x1 - x0) / (fx1 - fx0);
+    diff := abs(x2 - x1);
+end;
+
+if diff > tol then
+    error("Alcanzó el máximo de iteraciones");
+end;
+
+print("Convergió exitosamente");
+
+print("Iteraciones:", i);
+print("Raíz aproximada:", x2);
+print("Error:", diff);
