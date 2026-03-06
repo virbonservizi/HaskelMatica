@@ -16,7 +16,6 @@ data Value = VNum Number
            | VVector [Number]
            | VSeq [Number]
            | VStr String
-           | VUnit  -- Para skip y comandos sin valor
            deriving (Show, Eq)
 
 -- Entornos
@@ -44,10 +43,10 @@ data EvalError
     = DivByZero
     | VarNotFound Variable
     | FuncNotFound Variable
-    | TypeMismatch String  -- Ej: "Expected number, got boolean"
+    | TypeMismatch String
     | IndexOutOfBounds String
     | InvalidOperation String
-    | ArgumentMismatch Variable Int Int  -- función, esperados, recibidos
+    | ArgumentMismatch Variable Int Int
     | EmptySet String
     | MatrixDimensionMismatch String
     | RuntimeError String
@@ -178,7 +177,6 @@ valueToString (VSeq nums) = "<" ++ intercalate ", " (map showNum nums) ++ ">"
 valueToString (VMatrix rows) = "[" ++ intercalate "; " (map showRow rows) ++ "]"
     where showRow row = intercalate ", " (map showNum row)
 valueToString (VStr s) = s
-valueToString VUnit = "()"
 
 showNum :: Number -> String
 showNum (I n) = show n

@@ -59,7 +59,7 @@ print("");
 cantidad := cardinal(primos);
 print("Cantidad de primos encontrados:", cantidad);
 
-primo_min := min(primos);
-primo_max := max(primos);
+primo_min := setmin(primos);
+primo_max := setmax(primos);
 print("Primo más pequeño:", primo_min);
 print("Primo más grande:", primo_max);

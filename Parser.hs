@@ -24,7 +24,7 @@ mathLang = makeTokenParser (emptyDef
                          "cardinal", "min", "max", "sum",
                          "rows", "cols", "prod", "scal", "norm",
                          "length", "find", "zeros", "ones", "eye", "trans",
-                         "diag", "triu", "tril", "swaprows", "swapcols",
+                         "diag", "triu", "tril", "swaprows", "swapcols", "setmin", "setmax",
                          "union", "intersection", "difference", "symmetricdiff",
                          "insert", "remove", "contains",
                          "filter", "forall", "exists", "print", "error", "mod",
@@ -56,43 +56,42 @@ factor = try (parens mathLang numexp)
      <|> try parseVectorOperations
      <|> try parseSeqOperations
      <|> try parseNumber
-     <|> try parseFunCallNum
-     <|> try parseVarOrAccess
+     <|> try parseVarOrCallOrAccessNum
 
-powopp = do try (reservedOp mathLang "^")
+powopp = do reservedOp mathLang "^"
             return Pow
 
-multopp = do try (reservedOp mathLang "*")
+multopp = do reservedOp mathLang "*"
              return Mul
-          <|> do try (reservedOp mathLang "/")
+          <|> do reservedOp mathLang "/"
                  return Div
-          <|> do try (reserved mathLang "mod")
+          <|> do reserved mathLang "mod"
                  return Mod
 
-addopp = do try (reservedOp mathLang "+")
+addopp = do reservedOp mathLang "+"
             return Add
-         <|> do try (reservedOp mathLang "-")
+         <|> do reservedOp mathLang "-"
                 return Sub
 
 
 parseNumFunctions :: Parser NumExp
 parseNumFunctions = 
-        try (do reserved mathLang "abs"
-                e <- parens mathLang numexp
-                return (Abs e))
-    <|> try (do reserved mathLang "sqrt"
-                e <- parens mathLang numexp
-                return (Sqrt e))
-    <|> try (do reserved mathLang "sin"
-                e <- parens mathLang numexp
-                return (Sin e))
-    <|> try (do reserved mathLang "cos"
-                e <- parens mathLang numexp
-                return (Cos e))
-    <|> try (do reserved mathLang "exp"
-                e <- parens mathLang numexp
-                return (Exp e))
-    <|> try parseLog
+        do reserved mathLang "abs"
+           e <- parens mathLang numexp
+           return (Abs e)
+    <|> do reserved mathLang "sqrt"
+           e <- parens mathLang numexp
+           return (Sqrt e)
+    <|> do reserved mathLang "sin"
+           e <- parens mathLang numexp
+           return (Sin e)
+    <|> do reserved mathLang "cos"
+           e <- parens mathLang numexp
+           return (Cos e)
+    <|> do reserved mathLang "exp"
+           e <- parens mathLang numexp
+           return (Exp e)
+    <|> parseLog
 
 parseLog :: Parser NumExp
 parseLog = do
@@ -107,46 +106,46 @@ parseLog = do
 
 parseNumConstants :: Parser NumExp
 parseNumConstants = 
-        (do reserved mathLang "pi"
-            return Pi)
-    <|> (do reserved mathLang "e"
-            return E)
+        do reserved mathLang "pi"
+           return Pi
+    <|> do reserved mathLang "e"
+           return E
 
 
 parseSetOperations :: Parser NumExp
 parseSetOperations = 
-        try (do reserved mathLang "cardinal"
-                s <- parens mathLang setexp
-                return (Cardinal s))
-    <|> try (do reserved mathLang "min"
-                s <- parens mathLang setexp
-                return (SetMin s))
-    <|> try (do reserved mathLang "max"
-                s <- parens mathLang setexp
-                return (SetMax s))
-    <|> try (do reserved mathLang "sum"
-                s <- parens mathLang setexp
-                return (SetSum s))
+        do reserved mathLang "cardinal"
+           s <- parens mathLang setexp
+           return (Cardinal s)
+    <|> do reserved mathLang "setmin"
+           s <- parens mathLang setexp
+           return (SetMin s)
+    <|> do reserved mathLang "setmax"
+           s <- parens mathLang setexp
+           return (SetMax s)
+    <|> do reserved mathLang "sum"
+           s <- parens mathLang setexp
+           return (SetSum s)
 
 parseMatrixOperations :: Parser NumExp
 parseMatrixOperations = 
-        try (do reserved mathLang "rows"
-                m <- parens mathLang matrixexp
-                return (MatRows m))
-    <|> try (do reserved mathLang "cols"
-                m <- parens mathLang matrixexp
-                return (MatCols m))
+        do reserved mathLang "rows"
+           m <- parens mathLang matrixexp
+           return (MatRows m)
+    <|> do reserved mathLang "cols"
+           m <- parens mathLang matrixexp
+           return (MatCols m)
 
 parseVectorOperations :: Parser NumExp
 parseVectorOperations = 
         try parseProd
-    <|> try parseNorm
-    <|> try (do reserved mathLang "max"
-                v <- parens mathLang vectorexp
-                return (VecMax v))
-    <|> try (do reserved mathLang "min"
-                v <- parens mathLang vectorexp
-                return (VecMin v))
+    <|> parseNorm
+    <|> do reserved mathLang "max"
+           v <- parens mathLang vectorexp
+           return (VecMax v)
+    <|> do reserved mathLang "min"
+           v <- parens mathLang vectorexp
+           return (VecMin v)
 
 parseProd :: Parser NumExp
 parseProd = do
@@ -171,11 +170,11 @@ parseNorm = do
 
 parseSeqOperations :: Parser NumExp
 parseSeqOperations = 
-        try (do reserved mathLang "length"
-                s <- parens mathLang seqexp
-                return (SeqLength s))
-    <|> try parseSeqFind
-    <|> try parseSeqAccess
+        do reserved mathLang "length"
+           s <- parens mathLang seqexp
+           return (SeqLength s)
+    <|> parseSeqFind
+    <|> parseSeqAccess
 
 parseSeqFind :: Parser NumExp
 parseSeqFind = do
@@ -198,56 +197,38 @@ parseSeqAccess = do
     return (SeqAccess seq idx)
 
 parseNumber :: Parser NumExp
-parseNumber = do
-    isRangeAfter <- lookAhead ( optionMaybe ( try ( do
-        many1 digit
-        string ".." )))
-    
-    case isRangeAfter of 
-        Just _ -> do
-            n <- natural mathLang
-            return (Const (I (fromInteger n)))
+parseNumber = 
+    try (do
+        f <- float mathLang
+        return (Const (F (realToFrac f))))
+    <|> do
+        i <- natural mathLang
+        return (Const (I (fromInteger i)))
+
+parseVarOrCallOrAccessNum :: Parser NumExp
+parseVarOrCallOrAccessNum = do
+    var <- identifier mathLang
+    maybeFunCall <- optionMaybe (parens mathLang (commaSep mathLang expr))
+    case maybeFunCall of
+        Just args -> return (FunCallNum var args)
         Nothing -> do
-            n <- naturalOrFloat mathLang
-            case n of
-                Left i  -> return (Const (I (fromInteger i)))
-                Right f -> return (Const (F (realToFrac f)))
+            maybeAccess <- optionMaybe (symbol mathLang "[")
+            case maybeAccess of
+                Nothing -> return (VarNum var)
+                Just _ -> parseMatOrVecAccess var
 
-parseFunCallNum :: Parser NumExp
-parseFunCallNum = do
-    name <- identifier mathLang
-    args <- parens mathLang (commaSep mathLang expr)
-    return (FunCallNum name args)
-
-
-parseVarOrAccess :: Parser NumExp
-parseVarOrAccess = try ( do 
-        var <- identifier mathLang
-        parseAccessOrVar var)
-
-parseAccessOrVar :: String -> Parser NumExp
-parseAccessOrVar var = do
-    maybeOpenBracket <- optionMaybe (symbol mathLang "[")
-    case maybeOpenBracket of
-        Nothing -> 
-            return (VarNum var)
-        
-        Just _ -> do
-            (try (parseMatAccessRest var) 
-             <|> try (parseVecAccessRest var)
-             <|> fail "Slice detectado") 
-
-parseMatAccessRest var = do
-    i <- numexp
-    comma mathLang
-    j <- numexp
-    symbol mathLang "]"
-    return (MatAccess (VarMat var) i j)
-
-parseVecAccessRest var = do
-    i <- numexp
-    symbol mathLang "]"
-    return (VecAccess (VarVec var) i)
+parseMatOrVecAccess :: String -> Parser NumExp
+parseMatOrVecAccess var = 
+    try (do
+        i <- numexp
+        comma mathLang
+        j <- numexp
+        symbol mathLang "]"
+        return (MatAccess (VarMat var) i j))
+    <|> do
+        i <- numexp
+        symbol mathLang "]"
+        return (VecAccess (VarVec var) i)
 
 -- Parser de expresiones booleanas
 
@@ -257,29 +238,28 @@ boolexp = chainl1 boolexp2 oropp
 boolexp2 = chainl1 boolexp3 andopp
 
 boolexp3 = try (parens mathLang boolexp)
-       <|> try (do reservedOp mathLang "!"
-                   b <- boolexp3
-                   return (Not b))
-       <|> try parseBoolConstants
+       <|> do reservedOp mathLang "!"
+              b <- boolexp3
+              return (Not b)
+       <|> parseBoolConstants
        <|> try parseComparison
        <|> try parseSetMember
        <|> try parseSeqContains
-       <|> try parseQuantifiers
-       <|> try parseFunCallBool
-       <|> try parseVarBool
+       <|> parseQuantifiers
+       <|> try parseVarOrCallBool
 
-oropp = do try (reservedOp mathLang "||")
+oropp = do reservedOp mathLang "||"
            return Or
 
-andopp = do try (reservedOp mathLang "&&")
+andopp = do reservedOp mathLang "&&"
             return And
 
 parseBoolConstants :: Parser BoolExp
 parseBoolConstants = 
-        (do reserved mathLang "true"
-            return BTrue)
-    <|> (do reserved mathLang "false"
-            return BFalse)
+        do reserved mathLang "true"
+           return BTrue
+    <|> do reserved mathLang "false"
+           return BFalse
 
 parseComparison :: Parser BoolExp
 parseComparison = do
@@ -290,18 +270,18 @@ parseComparison = do
 
 parseCompOp :: Parser (NumExp -> NumExp -> BoolExp)
 parseCompOp = 
-        try (do reservedOp mathLang "="
-                return Eq)
-    <|> try (do reservedOp mathLang "!="
-                return Neq)
-    <|> try (do reservedOp mathLang "<="
-                return Lte)
-    <|> try (do reservedOp mathLang ">="
-                return Gte)
-    <|> try (do reservedOp mathLang "<"
-                return Lt)
-    <|> try (do reservedOp mathLang ">"
-                return Gt)
+        do reservedOp mathLang "="
+           return Eq
+    <|> do reservedOp mathLang "!="
+           return Neq
+    <|> do reservedOp mathLang "<="
+           return Lte
+    <|> do reservedOp mathLang ">="
+           return Gte
+    <|> do reservedOp mathLang "<"
+           return Lt
+    <|> do reservedOp mathLang ">"
+           return Gt
 
 parseSetMember :: Parser BoolExp
 parseSetMember = do
@@ -319,8 +299,8 @@ parseSeqContains = do
 
 parseQuantifiers :: Parser BoolExp
 parseQuantifiers = 
-        try parseForall
-    <|> try parseExists
+        parseForall
+    <|> parseExists
 
 parseForall :: Parser BoolExp
 parseForall = do
@@ -342,19 +322,15 @@ parseExists = do
     cond <- boolexp
     return (Exists var set cond)
 
-parseFunCallBool :: Parser BoolExp
-parseFunCallBool = do
+parseVarOrCallBool :: Parser BoolExp
+parseVarOrCallBool = do
     name <- identifier mathLang
-    args <- parens mathLang (commaSep mathLang expr)
-    return (FunCallBool name args)
-
-parseVarBool :: Parser BoolExp
-parseVarBool = do
-    var <- identifier mathLang
-    notFollowedBy (symbol mathLang "("
-               <|> symbol mathLang "["
-               <|> symbol mathLang "<") 
-    return (VarBool var)
+    maybeArgs <- optionMaybe (parens mathLang (commaSep mathLang expr))
+    case maybeArgs of
+        Just args -> return (FunCallBool name args)
+        Nothing   -> do
+            notFollowedBy (symbol mathLang "[")
+            return (VarBool name)
 
 -- Parser de expresiones de conjuntos
 
@@ -362,9 +338,8 @@ setexp :: Parser SetExp
 setexp = try parseSetCompr 
      <|> try parseRange 
      <|> try parseSetLit
-     <|> try parseSetFunctions
-     <|> try parseFunCallSet
-     <|> try parseVarSet
+     <|> parseSetFunctions
+     <|> try parseVarOrCallSet
      <|> parens mathLang setexp
 
 parseSetCompr :: Parser SetExp 
@@ -402,12 +377,12 @@ parseSetLit = do
 
 parseSetFunctions :: Parser SetExp
 parseSetFunctions = 
-        try parseUnion
-    <|> try parseIntersection
-    <|> try parseDifference
-    <|> try parseSymmetricDiff
-    <|> try parseInsert
-    <|> try parseRemove
+        parseUnion
+    <|> parseIntersection
+    <|> parseDifference
+    <|> parseSymmetricDiff
+    <|> parseInsert
+    <|> parseRemove
 
 parseUnion :: Parser SetExp
 parseUnion = do
@@ -469,20 +444,15 @@ parseRemove = do
     symbol mathLang ")"
     return (Remove var elem)
 
-
-parseFunCallSet :: Parser SetExp
-parseFunCallSet = do
+parseVarOrCallSet :: Parser SetExp
+parseVarOrCallSet = do
     name <- identifier mathLang
-    args <- parens mathLang (commaSep mathLang expr)
-    return (FunCallSet name args)
-
-parseVarSet :: Parser SetExp
-parseVarSet = do
-    var <- identifier mathLang
-    notFollowedBy (symbol mathLang "("
-               <|> symbol mathLang "["
-               <|> symbol mathLang "<")
-    return (VarSet var)
+    maybeArgs <- optionMaybe (parens mathLang (commaSep mathLang expr))
+    case maybeArgs of
+        Just args -> return (FunCallSet name args)
+        Nothing   -> do
+            notFollowedBy (symbol mathLang "[")
+            return (VarSet name)
 
 -- Parser de expresiones de matrices
 
@@ -493,26 +463,25 @@ matterm = chainl1 matfactor mulmatopp
 
 matfactor = try parseMatLit
         <|> try parseMatZeros
-        <|> try parseMatOnes
-        <|> try parseMatEye
+        <|> parseMatOnes
+        <|> parseMatEye
         <|> try parseMatSlice
-        <|> try parseMatTrans
-        <|> try parseMatDiag
-        <|> try parseMatTriU
-        <|> try parseMatTriL
-        <|> try parseMatSwapRows
-        <|> try parseMatSwapCols
-        <|> try parseFunCallMat
-        <|> try parseVarMat
+        <|> parseMatTrans
+        <|> parseMatDiag
+        <|> parseMatTriU
+        <|> parseMatTriL
+        <|> parseMatSwapRows
+        <|> parseMatSwapCols
+        <|> try parseVarOrCallMat
         <|> parens mathLang matrixexp
 
-mulmatopp = do try (reservedOp mathLang "#*")
+mulmatopp = do reservedOp mathLang "#*"
                return MatMul
 
-addmatopp = do try (reservedOp mathLang "#+")
+addmatopp = do reservedOp mathLang "#+"
                return MatAdd
-            <|> do try (reservedOp mathLang "#-")
-                   return MatSub
+        <|> do reservedOp mathLang "#-"
+               return MatSub
 
 parseMatLit :: Parser MatrixExp
 parseMatLit = do
@@ -611,20 +580,15 @@ parseMatSwapCols = do
     symbol mathLang ")"
     return (MatSwapCols mat i j)
 
-
-parseFunCallMat :: Parser MatrixExp
-parseFunCallMat = do
+parseVarOrCallMat :: Parser MatrixExp
+parseVarOrCallMat = do
     name <- identifier mathLang
-    args <- parens mathLang (commaSep mathLang expr)
-    return (FunCallMat name args)
-
-parseVarMat :: Parser MatrixExp
-parseVarMat = do
-    var <- identifier mathLang
-    notFollowedBy (symbol mathLang "("
-               <|> symbol mathLang "["
-               <|> symbol mathLang "<")
-    return (VarMat var)
+    maybeArgs <- optionMaybe (parens mathLang (commaSep mathLang expr))
+    case maybeArgs of
+        Just args -> return (FunCallMat name args)
+        Nothing   -> do
+            notFollowedBy (symbol mathLang "[")
+            return (VarMat name)
 
 -- Parser de expresiones de vectores
 
@@ -642,20 +606,19 @@ vecterm = do
         Nothing -> return base
         Just mat -> return (VecMatMul base mat)
 
-addvecop = do try (reservedOp mathLang ".+")
+addvecop = do reservedOp mathLang ".+"
               return VecAdd
-           <|> do try (reservedOp mathLang ".-")
-                  return VecSub
+       <|> do reservedOp mathLang ".-"
+              return VecSub
 
 vecfactor = try parseVecLit
         <|> try parseVecZeros
-        <|> try parseScal
+        <|> parseScal
         <|> try parseVecSlice
         <|> try parseMatRow
         <|> try parseMatCol
         <|> try parseMatVecMul
-        <|> try parseFunCallVec
-        <|> try parseVarVec
+        <|> try parseVarOrCallVec
         <|> parens mathLang vectorexp
 
 parseVecLit :: Parser VectorExp
@@ -695,7 +658,6 @@ parseVecSlice = do
     symbol mathLang "]"
     return (VecSlice (VarVec var) i1 i2)
 
-
 parseMatRow :: Parser VectorExp
 parseMatRow = do
     var <- identifier mathLang  -- Solo variables
@@ -723,26 +685,21 @@ parseMatVecMul = try (do
     vec <- vecfactor
     return (MatVecMul mat vec))
 
-parseFunCallVec :: Parser VectorExp
-parseFunCallVec = do
+parseVarOrCallVec :: Parser VectorExp
+parseVarOrCallVec = do
     name <- identifier mathLang
-    args <- parens mathLang (commaSep mathLang expr)
-    return (FunCallVec name args)
-
-parseVarVec :: Parser VectorExp
-parseVarVec = try (do
-    var <- identifier mathLang
-    notFollowedBy (symbol mathLang "("
-               <|> symbol mathLang "["
-               <|> symbol mathLang "<")
-    return (VarVec var))
+    maybeArgs <- optionMaybe (parens mathLang (commaSep mathLang expr))
+    case maybeArgs of
+        Just args -> return (FunCallVec name args)
+        Nothing   -> do
+            notFollowedBy (symbol mathLang "[")
+            return (VarVec name)
 
 -- Parser de expresiones de strings
 
 strexp :: Parser StrExp
 strexp = try parseStrLit
-     <|> try parseFunCallStr
-     <|> try parseVarStr
+     <|> try parseVarOrCallStr
      <|> parens mathLang strexp
 
 parseStrLit :: Parser StrExp
@@ -750,31 +707,26 @@ parseStrLit = do
     s <- stringLiteral mathLang
     return (StrLit s)
 
-parseFunCallStr :: Parser StrExp
-parseFunCallStr = do
+parseVarOrCallStr :: Parser StrExp
+parseVarOrCallStr = do
     name <- identifier mathLang
-    args <- parens mathLang (commaSep mathLang expr)
-    return (FunCallStr name args)
-
-parseVarStr :: Parser StrExp
-parseVarStr = try (do
-    var <- identifier mathLang
-    notFollowedBy (symbol mathLang "("
-               <|> symbol mathLang "["
-               <|> symbol mathLang "<")
-    return (VarStr var))
+    maybeArgs <- optionMaybe (parens mathLang (commaSep mathLang expr))
+    case maybeArgs of
+        Just args -> return (FunCallStr name args)
+        Nothing   -> do
+            notFollowedBy (symbol mathLang "[")
+            return (VarStr name)
 
 -- Parser de expresiones de secuencias
 
 seqexp :: Parser SeqExp
 seqexp = try parseSeqLit
-     <|> try parseSeqSlice
-     <|> try parseSeqConcat
-     <|> try parseSeqAppend
-     <|> try parseSeqPrepend
-     <|> try parseSeqFilter
-     <|> try parseFunCallSeq
-     <|> try parseVarSeq
+     <|> parseSeqSlice
+     <|> parseSeqConcat
+     <|> parseSeqAppend
+     <|> parseSeqPrepend
+     <|> parseSeqFilter
+     <|> try parseVarOrCallSeq
      <|> parens mathLang seqexp
 
 parseSeqLit :: Parser SeqExp
@@ -838,25 +790,20 @@ parseSeqFilter = do
     symbol mathLang ")"
     return (SeqFilter var seq cond)
 
-parseFunCallSeq :: Parser SeqExp
-parseFunCallSeq = do
+parseVarOrCallSeq :: Parser SeqExp
+parseVarOrCallSeq = do
     name <- identifier mathLang
-    args <- parens mathLang (commaSep mathLang expr)
-    return (FunCallSeq name args)
-
-parseVarSeq :: Parser SeqExp
-parseVarSeq = try (do
-    var <- identifier mathLang
-    notFollowedBy (symbol mathLang "("
-               <|> symbol mathLang "["
-               <|> symbol mathLang "<")
-    return (VarSeq var))
+    maybeArgs <- optionMaybe (parens mathLang (commaSep mathLang expr))
+    case maybeArgs of
+        Just args -> return (FunCallSeq name args)
+        Nothing   -> do
+            notFollowedBy (symbol mathLang "[")
+            return (VarSeq name)
 
 -- Parser de expresiones generales
 
 expr :: Parser Exp
-expr = try parseVar
-   <|> try parseFunCall
+expr = try parseVarOrFunCall
    <|> try (do e <- boolexp
                return (EBool e))
    <|> try (do e <- numexp
@@ -876,90 +823,102 @@ data OperatorType = MatrixOp | VectorOp | ScalarOp | BoolOp
 
 detectOperatorType :: Parser OperatorType
 detectOperatorType = choice [
-    try (reservedOp mathLang "#+" >> return MatrixOp),
-    try (reservedOp mathLang "#-" >> return MatrixOp),
-    try (reservedOp mathLang "#*" >> return MatrixOp),
-    try (reservedOp mathLang "#.*" >> return VectorOp),
-    try (reservedOp mathLang ".+" >> return VectorOp),
-    try (reservedOp mathLang ".-" >> return VectorOp),
-    try (reservedOp mathLang ".#*" >> return VectorOp),
-    try (reservedOp mathLang ".*" >> return VectorOp),
-    try (reservedOp mathLang "+" >> return ScalarOp),
-    try (reservedOp mathLang "-" >> return ScalarOp),
-    try (reservedOp mathLang "*" >> return ScalarOp),
-    try (reservedOp mathLang "/" >> return ScalarOp),
-    try (reservedOp mathLang "^" >> return ScalarOp),
-    try (reserved mathLang "mod" >> return ScalarOp),
-    try (reservedOp mathLang "&&" >> return BoolOp),
-    try (reservedOp mathLang "||" >> return BoolOp),
-    try (reservedOp mathLang "=" >> return BoolOp),
-    try (reservedOp mathLang "!=" >> return BoolOp),
-    try (reservedOp mathLang "<" >> return BoolOp),
-    try (reservedOp mathLang "<=" >> return BoolOp),
-    try (reservedOp mathLang ">" >> return BoolOp),
-    try (reservedOp mathLang ">=" >> return BoolOp),
-    try (reserved mathLang "in" >> return BoolOp),
-    try (reserved mathLang "contains" >> return BoolOp)
+    do reservedOp mathLang "#+"
+       return MatrixOp,
+    do reservedOp mathLang "#-"
+       return MatrixOp,
+    do reservedOp mathLang "#*"
+       return MatrixOp,
+    do reservedOp mathLang "#.*"
+       return VectorOp,
+    do reservedOp mathLang ".+"
+       return VectorOp,
+    do reservedOp mathLang ".-"
+       return VectorOp,
+    do reservedOp mathLang ".#*"
+       return VectorOp,
+    do reservedOp mathLang ".*"
+       return VectorOp,
+    do reservedOp mathLang "+"
+       return ScalarOp,
+    do reservedOp mathLang "-"
+       return ScalarOp,
+    do reservedOp mathLang "*"
+       return ScalarOp,
+    do reservedOp mathLang "/"
+       return ScalarOp,
+    do reservedOp mathLang "^"
+       return ScalarOp,
+    do reserved mathLang "mod"
+       return ScalarOp,
+    do reservedOp mathLang "&&"
+       return BoolOp,
+    do reservedOp mathLang "||"
+       return BoolOp,
+    do reservedOp mathLang "="
+       return BoolOp,
+    do reservedOp mathLang "!="
+       return BoolOp,
+    do reservedOp mathLang "<"
+       return BoolOp,
+    do reservedOp mathLang "<="
+       return BoolOp,
+    do reservedOp mathLang ">"
+       return BoolOp,
+    do reservedOp mathLang ">="
+       return BoolOp,
+    do reserved mathLang "in"
+       return BoolOp,
+    do reserved mathLang "contains"
+       return BoolOp
     ]
 
-parseFunCall :: Parser Exp
-parseFunCall = do
-    _ <- lookAhead (do
-        identifier mathLang
-        symbol mathLang "(")
-    
-    opType <- lookAhead $ optionMaybe (try (do
-        identifier mathLang
-        parens mathLang (commaSep mathLang expr)
-        detectOperatorType))
-    
-    case opType of
-        Just MatrixOp -> do
-            e <- matrixexp
-            return (EMatrix e)
-        Just VectorOp -> do
-            e <- vectorexp
-            return (EVector e)
-        Just ScalarOp -> do
-            e <- numexp
-            return (ENum e)
-        Just BoolOp -> do
-            e <- boolexp
-            return (EBool e)
-        _ -> do
-            -- No hay operador, parsear función genérica
-            name <- identifier mathLang
-            args <- parens mathLang (commaSep mathLang expr)
-            return (FunCall name args)
+-- Función auxiliar para parsear según el tipo de operador detectado
+parseByOperatorType :: Maybe OperatorType -> Parser Exp
+parseByOperatorType opType = case opType of
+    Just MatrixOp -> do
+        e <- matrixexp
+        return (EMatrix e)
+    Just VectorOp -> do
+        e <- vectorexp
+        return (EVector e)
+    Just ScalarOp -> do
+        e <- numexp
+        return (ENum e)
+    Just BoolOp -> do
+        e <- boolexp
+        return (EBool e)
+    Nothing -> fail "no operator type detected"
 
-parseVar :: Parser Exp
-parseVar = do
-    var <- lookAhead (identifier mathLang)
-    notFollowedByAccess <- lookAhead $ optionMaybe (try (do
+parseVarOrFunCall :: Parser Exp
+parseVarOrFunCall = do
+    -- Verificar si es función o acceso
+    followedBy <- lookAhead $ optionMaybe (try (do
         identifier mathLang
         choice [symbol mathLang "(", symbol mathLang "["]))
-    case notFollowedByAccess of
-        Just _ -> fail "identifier followed by ( or ["
-        Nothing -> do
+    
+    case followedBy of
+        Just "[" -> fail "identifier followed by ["
+        Just "(" -> do
+            opType <- lookAhead $ optionMaybe (try (do
+                identifier mathLang
+                parens mathLang (commaSep mathLang expr)
+                detectOperatorType))
+            case opType of
+                Nothing -> do
+                    name <- identifier mathLang
+                    args <- parens mathLang (commaSep mathLang expr)
+                    return (FunCall name args)
+                _ -> parseByOperatorType opType
+        _ -> do
             opType <- lookAhead $ optionMaybe (try (do
                 identifier mathLang
                 detectOperatorType))
             case opType of
-                Just MatrixOp -> do
-                    e <- matrixexp
-                    return (EMatrix e)
-                Just VectorOp -> do
-                    e <- vectorexp
-                    return (EVector e)
-                Just ScalarOp -> do
-                    e <- numexp
-                    return (ENum e)
-                Just BoolOp -> do
-                    e <- boolexp
-                    return (EBool e)
-                _ -> do
+                Nothing -> do
                     v <- identifier mathLang
                     return (EVar v)
+                _ -> parseByOperatorType opType
 
 -- Parser de comandos
 
@@ -969,14 +928,14 @@ comm = do
     return $ foldr1 SeqComm cmds
 
 comm2 :: Parser Comm
-comm2 = try parseSkip
-    <|> try parseIf
-    <|> try parseWhile
-    <|> try parseFor
-    <|> try parseForEach
-    <|> try parseFuncDef
-    <|> try parsePrint
-    <|> try parseError
+comm2 = parseSkip
+    <|> parseIf
+    <|> parseWhile
+    <|> parseFor
+    <|> parseForEach
+    <|> parseFuncDef
+    <|> parsePrint
+    <|> parseError
     <|> try parseAssign
 
 parseSkip :: Parser Comm
