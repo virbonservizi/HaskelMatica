@@ -512,7 +512,9 @@ evalBoolExp (FunCallBool fname args) = do
 -- Evaluación de Conjuntos
 
 evalSetExp :: SetExp -> EvalM [Number]
-evalSetExp (SetLit exprs) = mapM evalNumExp exprs
+evalSetExp (SetLit exprsNum) = do 
+    nums <- mapM evalNumExp exprsNum
+    return (removeDuplicates nums)
 
 evalSetExp (VarSet v) = do
     val <- lookupVar v
