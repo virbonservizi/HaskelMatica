@@ -663,15 +663,15 @@ evalMatrixExp (MatSlice matExp r1Exp r2Exp c1Exp c2Exp) = do
     c2 <- evalNumExp c2Exp
     case (r1, r2, c1, c2) of
         (I rStart, I rEnd, I cStart, I cEnd) -> do
-            when (rStart < 0 || rEnd >= length mat || rStart > rEnd) $
+            when (rStart <= 0 || rEnd > length mat || rStart > rEnd) $
                 throwError $ IndexOutOfBounds "Índices de fila inválidos"
             when (null mat) $
                 throwError $ InvalidOperation "Matriz vacía"
             let numCols = length (head mat)
-            when (cStart < 0 || cEnd >= numCols || cStart > cEnd) $
+            when (cStart <= 0 || cEnd > numCols || cStart > cEnd) $
                 throwError $ IndexOutOfBounds "Índices de columna inválidos"
-            let selectedRows = take (rEnd - rStart + 1) $ drop rStart mat
-                sliced = map (\row -> take (cEnd - cStart + 1) $ drop cStart row) selectedRows
+            let selectedRows = take (rEnd - rStart + 1) $ drop (rStart - 1) mat
+                sliced = map (\row -> take (cEnd - cStart + 1) $ drop (cStart - 1) row) selectedRows
             return sliced
         _ -> throwError $ TypeMismatch "Los índices deben ser enteros"
 
@@ -823,9 +823,9 @@ evalVectorExp (VecSlice vecExp startExp endExp) = do
     end <- evalNumExp endExp
     case (start, end) of
         (I s, I e) -> do
-            when (s < 0 || e >= length vec || s > e) $
+            when (s <= 0 || e > length vec || s > e) $
                 throwError $ IndexOutOfBounds "Índices de slice inválidos"
-            return $ take (e - s + 1) $ drop s vec
+            return $ take (e - s + 1) $ drop (s - 1) vec
         _ -> throwError $ TypeMismatch "Los índices deben ser enteros"
 
 evalVectorExp (VecAdd v1Exp v2Exp) = do
@@ -854,9 +854,9 @@ evalVectorExp (MatRow matExp rowExp) = do
         throwError $ InvalidOperation "Matriz vacía"
     case row of
         I r -> do
-            when (r < 0 || r >= length mat) $
+            when (r <= 0 || r > length mat) $
                 throwError $ IndexOutOfBounds ("Fila " ++ show r ++ " fuera de rango")
-            return $ mat !! r
+            return $ mat !! (r - 1)
         _ -> throwError $ TypeMismatch "El índice de fila debe ser entero"
 
 evalVectorExp (MatCol matExp colExp) = do
@@ -867,9 +867,9 @@ evalVectorExp (MatCol matExp colExp) = do
     case col of
         I c -> do
             let numCols = length (head mat)
-            when (c < 0 || c >= numCols) $
+            when (c <= 0 || c > numCols) $
                 throwError $ IndexOutOfBounds ("Columna " ++ show c ++ " fuera de rango")
-            return [row !! c | row <- mat]
+            return [row !! (c - 1) | row <- mat]
         _ -> throwError $ TypeMismatch "El índice de columna debe ser entero"
 
 evalVectorExp (FunCallVec fname args) = do
