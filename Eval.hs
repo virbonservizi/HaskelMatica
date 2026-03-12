@@ -854,9 +854,9 @@ evalVectorExp (MatRow matExp rowExp) = do
         throwError $ InvalidOperation "Matriz vacía"
     case row of
         I r -> do
-            when (r < 0 || r >= length mat) $
+            when (r <= 0 || r > length mat) $
                 throwError $ IndexOutOfBounds ("Fila " ++ show r ++ " fuera de rango")
-            return $ mat !! r
+            return $ mat !! (r - 1)
         _ -> throwError $ TypeMismatch "El índice de fila debe ser entero"
 
 evalVectorExp (MatCol matExp colExp) = do
@@ -867,9 +867,9 @@ evalVectorExp (MatCol matExp colExp) = do
     case col of
         I c -> do
             let numCols = length (head mat)
-            when (c < 0 || c >= numCols) $
+            when (c <= 0 || c > numCols) $
                 throwError $ IndexOutOfBounds ("Columna " ++ show c ++ " fuera de rango")
-            return [row !! c | row <- mat]
+            return [row !! (c - 1) | row <- mat]
         _ -> throwError $ TypeMismatch "El índice de columna debe ser entero"
 
 evalVectorExp (FunCallVec fname args) = do
@@ -883,7 +883,31 @@ evalVectorExp (VecMatMul vecExp matExp) = do
     mat <- evalMatrixExp matExp
     
     when (null mat) $
+        throwError $ InvalidOperation "Matriz vevalVectorExp (MatRow matExp rowExp) = do
+    mat <- evalMatrixExp matExp
+    row <- evalNumExp rowExp
+    when (null mat) $
         throwError $ InvalidOperation "Matriz vacía"
+    case row of
+        I r -> do
+            when (r <= 0 || r > length mat) $
+                throwError $ IndexOutOfBounds ("Fila " ++ show r ++ " fuera de rango")
+            return $ mat !! (r - 1)
+        _ -> throwError $ TypeMismatch "El índice de fila debe ser entero"
+
+evalVectorExp (MatCol matExp colExp) = do
+    mat <- evalMatrixExp matExp
+    col <- evalNumExp colExp
+    when (null mat) $
+        throwError $ InvalidOperation "Matriz vacía"
+    case col of
+        I c -> do
+            let numCols = length (head mat)
+            when (c <= 0 || c > numCols) $
+                throwError $ IndexOutOfBounds ("Columna " ++ show c ++ " fuera de rango")
+            return [row !! (c - 1) | row <- mat]
+        _ -> throwError $ TypeMismatch "El índice de columna debe ser entero"
+acía"
     
     let numRows = length mat
     let numCols = if null mat then 0 else length (head mat)
