@@ -1,0 +1,4 @@
+print(cuadrado(10));
+def cuadrado(nro) do
+  return nro*nro;
+end;
