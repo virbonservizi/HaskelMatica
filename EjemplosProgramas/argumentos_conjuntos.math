@@ -1,0 +1,8 @@
+// Ejemplo con conjuntos como argumentos
+// Uso: run "EjemplosProgramas/argumentos_conjuntos.math" ["{1,2,3}", "{x | x <- {1,2,6}, x > 5}"]
+
+print("Primer conjunto:");
+print(arg1);
+
+print("Segundo conjunto:");
+print(arg2);

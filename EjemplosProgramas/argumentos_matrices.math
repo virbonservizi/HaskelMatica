@@ -1,0 +1,8 @@
+// Ejemplo con matrices como argumentos
+// Uso: run "EjemplosProgramas/argumentos_matrices.math" ["[1,2;3,4]", "[5,6;7,8]"]
+
+print("Primera matriz:");
+print(arg1);
+
+print("Segunda matriz:");
+print(arg2);

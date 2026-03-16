@@ -1,0 +1,8 @@
+// Ejemplo con números como argumentos
+// Uso: run "EjemplosProgramas/argumentos_numericos.math" ["42", "100"]
+
+print("Argumento 1:");
+print(arg1);
+
+print("Argumento 2:");
+print(arg2);
