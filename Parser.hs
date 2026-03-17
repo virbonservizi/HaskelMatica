@@ -41,13 +41,13 @@ mathLang = makeTokenParser (emptyDef
 numexp :: Parser NumExp
 numexp = chainl1 term addopp
 
-term = chainl1 powTerm multopp
+term = chainl1 factor multopp
 
-powTerm = chainl1 factor powopp
+factor = chainl1 operand powopp
 
-factor = try (parens mathLang numexp)
+operand = try (parens mathLang numexp)
      <|> try (do reservedOp mathLang "-"
-                 f <- factor
+                 f <- operand
                  return (Neg f))
      <|> try parseNumFunctions
      <|> try parseNumConstants
